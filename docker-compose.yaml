@@ -1,0 +1,33 @@
+version: "3.9"
+
+networks:
+  internal:
+
+services:
+  web:
+    build: ./web
+    ports:
+      - "7070:80"
+    networks:
+      - internal
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "gofinger"
+      POSTGRES_USER: "gofinger"
+      POSTGRES_PASSWORD: "example"
+    volumes:
+      - ./deploy/migrations:/docker-entrypoint-initdb.d
+      - ./deploy/pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - internal
